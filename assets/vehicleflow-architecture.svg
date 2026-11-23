@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="520" viewBox="0 0 1200 520" role="img" aria-labelledby="title desc">
+<title id="title">VehicleFlow computer vision pipeline</title>
+<desc id="desc">Traffic video is processed by motion detection, contour extraction, centroid tracking and virtual line counting, then shown in a Streamlit dashboard with a CSV report.</desc>
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#101827"/><stop offset="1" stop-color="#172b3a"/></linearGradient>
+  <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#22d3ee"/><stop offset="1" stop-color="#34d399"/></linearGradient>
+  <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0 0 L0 6 L9 3 z" fill="#67e8f9"/></marker>
+  <style>
+    .heading{font:700 27px Arial,sans-serif;fill:#f8fafc}.sub{font:15px Arial,sans-serif;fill:#a8bacb}
+    .box{fill:#1c3041;stroke:#35536a;stroke-width:2}.label{font:700 17px Arial,sans-serif;fill:#f8fafc;text-anchor:middle}
+    .detail{font:14px Arial,sans-serif;fill:#bdd0df;text-anchor:middle}.step{font:700 13px Arial,sans-serif;fill:#67e8f9}
+    .arrow{stroke:#67e8f9;stroke-width:3;fill:none;marker-end:url(#arrow)}
+  </style>
+</defs>
+<rect width="1200" height="520" rx="24" fill="url(#bg)"/>
+<text x="56" y="62" class="heading">VehicleFlow · Processing architecture</text>
+<text x="56" y="91" class="sub">From a traffic video to tracked line-crossing counts</text>
+<g transform="translate(55 150)">
+  <rect class="box" width="155" height="142" rx="16"/>
+  <text x="77" y="32" class="step" text-anchor="middle">01 · INPUT</text>
+  <path d="M45 58h65v48H45z M57 48h42v10H57z" fill="none" stroke="#67e8f9" stroke-width="3"/>
+  <path d="M70 69l22 13-22 13z" fill="#34d399"/>
+  <text x="77" y="126" class="label">Traffic video</text>
+</g>
+<path class="arrow" d="M216 221h28"/>
+<g transform="translate(250 150)">
+  <rect class="box" width="170" height="142" rx="16"/>
+  <text x="85" y="32" class="step" text-anchor="middle">02 · DETECT</text>
+  <path d="M43 58h84v49H43z" fill="none" stroke="#67e8f9" stroke-width="2"/>
+  <path d="M54 95l16-20 13 10 18-18 17 25" fill="none" stroke="#34d399" stroke-width="3"/>
+  <text x="85" y="126" class="label">Motion regions</text>
+</g>
+<path class="arrow" d="M426 221h28"/>
+<g transform="translate(460 150)">
+  <rect class="box" width="170" height="142" rx="16"/>
+  <text x="85" y="32" class="step" text-anchor="middle">03 · TRACK</text>
+  <rect x="48" y="57" width="30" height="30" fill="none" stroke="#34d399" stroke-width="3"/>
+  <rect x="91" y="69" width="30" height="30" fill="none" stroke="#67e8f9" stroke-width="3"/>
+  <path d="M63 90Q83 112 106 100" fill="none" stroke="#67e8f9" stroke-width="2" stroke-dasharray="4 4"/>
+  <text x="85" y="126" class="label">Centroid IDs</text>
+</g>
+<path class="arrow" d="M636 221h28"/>
+<g transform="translate(670 150)">
+  <rect class="box" width="170" height="142" rx="16"/>
+  <text x="85" y="32" class="step" text-anchor="middle">04 · COUNT</text>
+  <path d="M39 83h92" stroke="#fb923c" stroke-width="4" stroke-dasharray="7 5"/>
+  <circle cx="64" cy="62" r="9" fill="#34d399"/><path d="M64 72v26m-8-8 8 8 8-8" stroke="#34d399" stroke-width="3" fill="none"/>
+  <text x="85" y="126" class="label">Line crossing</text>
+</g>
+<path class="arrow" d="M846 221h28"/>
+<g transform="translate(880 150)">
+  <rect class="box" width="265" height="142" rx="16"/>
+  <text x="132" y="32" class="step" text-anchor="middle">05 · RESULTS</text>
+  <rect x="35" y="55" width="82" height="45" rx="7" fill="#203f50" stroke="#34d399"/>
+  <text x="76" y="74" class="detail">TOTAL</text><text x="76" y="92" class="label">Count</text>
+  <path d="M143 99V58h78" stroke="#67e8f9" stroke-width="3" fill="none"/>
+  <path d="M143 89l20-13 17 8 17-20 24-9" stroke="#34d399" stroke-width="3" fill="none"/>
+  <text x="132" y="126" class="label">Dashboard + CSV</text>
+</g>
+<path d="M55 350h1090" stroke="#35536a" stroke-width="1"/>
+<text x="56" y="394" class="heading" style="font-size:20px">Core methods</text>
+<g transform="translate(56 420)">
+  <rect width="250" height="44" rx="22" fill="#183a4a" stroke="#2d7180"/><text x="125" y="28" class="detail">Frame differencing</text>
+  <rect x="270" width="250" height="44" rx="22" fill="#183a4a" stroke="#2d7180"/><text x="395" y="28" class="detail">Contours + morphology</text>
+  <rect x="540" width="250" height="44" rx="22" fill="#183a4a" stroke="#2d7180"/><text x="665" y="28" class="detail">Greedy centroid matching</text>
+  <rect x="810" width="278" height="44" rx="22" fill="#183a4a" stroke="#2d7180"/><text x="949" y="28" class="detail">Direction-aware counting</text>
+</g>
+</svg>

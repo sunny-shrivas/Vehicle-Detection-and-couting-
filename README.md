@@ -1,68 +1,163 @@
-# VehicleFlow — Vehicle Detection & Counting with OpenCV
+# VehicleFlow 🚦
+### Vehicle Detection & Counting with OpenCV
 
-A modern Python 3 rebuild of the original project. It uses classical computer vision to detect moving regions in fixed-camera traffic footage, track them across frames, and count unique tracks crossing a configurable virtual line.
+[![Tests](https://github.com/sunny-shrivas/Vehicle-Detection-and-couting-/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/sunny-shrivas/Vehicle-Detection-and-couting-/actions/workflows/tests.yml)
+![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)
+![OpenCV](https://img.shields.io/badge/OpenCV-Computer%20Vision-5C3EE8?logo=opencv&logoColor=white)
+![Streamlit](https://img.shields.io/badge/UI-Streamlit-FF4B4B?logo=streamlit&logoColor=white)
+![License](https://img.shields.io/badge/Project-Research%20Prototype-informational)
 
-> **Scope:** this is a motion-detection prototype, not a YOLO detector or production traffic surveillance system. Vehicle-size grouping uses bounding-box width as a heuristic, not semantic vehicle classification.
+**VehicleFlow** is a Python-based traffic video analysis prototype. It detects moving regions in fixed-camera footage, associates detections across frames, and counts tracked objects when they cross a configurable virtual line.
+
+The project modernizes the original vehicle-counting script into a modular OpenCV pipeline with a Streamlit interface, CSV reporting, and automated tests.
+
+> [!NOTE]
+> This implementation uses **classical motion detection**, not a trained vehicle detector such as YOLO. It detects moving regions rather than identifying vehicle classes. The width-based size grouping is only a rough heuristic and should not be treated as reliable vehicle classification.
+
+---
+
+## Visual pipeline
+
+![VehicleFlow processing architecture](assets/vehicleflow-architecture.svg)
+
+1. **Video input** — upload a traffic clip through the Streamlit interface.
+2. **Motion detection** — grayscale conversion, Gaussian blur, frame differencing, thresholding, and morphology.
+3. **Object proposals** — contours are filtered by area and converted to bounding boxes.
+4. **Centroid tracking** — nearby detections are associated with existing track IDs.
+5. **Line crossing** — each tracked object is counted once when it crosses the selected line in the configured direction.
+6. **Results** — review live counts and download a frame-by-frame CSV report.
 
 ## Features
-- Frame differencing, Gaussian blur, thresholding, and morphological cleanup.
-- Contour-based moving-object proposals with configurable minimum area.
-- Lightweight centroid association with predicted positions and missed-frame handling.
-- Configurable horizontal counting line with up/down/both directions.
-- Per-track de-duplication and optional width-based grouping.
-- Streamlit upload interface, annotated preview, live metrics, count timeline, and CSV export.
+
+- Upload MP4, AVI, MOV, and MKV traffic videos.
+- Configurable horizontal counting-line position.
+- Count downward, upward, or both crossing directions.
+- Frame-difference motion detection with morphological noise cleanup.
+- Centroid-based tracking with predicted positions and missed-frame tolerance.
+- Per-track duplicate prevention during a counting run.
+- Live annotated frame preview and count metrics.
+- Count timeline and downloadable CSV report.
 - Unit tests and GitHub Actions workflow.
 
-## Architecture
-```text
-Video upload → OpenCV → MotionDetector → CentroidTracker → LineCounter
-                                              ↓
-                              Streamlit preview, metrics, CSV report
+## Tech stack
+
+| Area | Technology |
+|---|---|
+| Language | Python 3 |
+| Computer vision | OpenCV |
+| Numerical processing | NumPy |
+| Dashboard | Streamlit |
+| Tabular reports | Pandas |
+| Testing | Pytest |
+| CI | GitHub Actions |
+
+## Run locally
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/sunny-shrivas/Vehicle-Detection-and-couting-.git
+cd Vehicle-Detection-and-couting-
 ```
 
-## Quick start
-Python 3.10 or 3.11 is recommended.
+### 2. Create and activate a virtual environment
+
+**macOS / Linux**
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-python -m pip install --upgrade pip
-pip install -r requirements.txt
-streamlit run app.py
 ```
-Windows PowerShell:
+
+**Windows PowerShell**
 ```powershell
 py -3.11 -m venv .venv
 .\.venv\Scripts\Activate.ps1
+```
+
+### 3. Install dependencies
+
+```bash
 python -m pip install --upgrade pip
 pip install -r requirements.txt
+```
+
+### 4. Launch VehicleFlow
+
+```bash
 streamlit run app.py
 ```
-Upload an MP4, AVI, MOV, or MKV clip, configure the line and thresholds, then start analysis.
 
-## Tests
-```bash
-pytest -q
+Open the local Streamlit URL shown in the terminal, upload a traffic video, adjust the settings in the sidebar, and select **Start analysis**.
+
+## Configuration guide
+
+| Setting | What it controls | Tuning guidance |
+|---|---|---|
+| Counting line position | Vertical position of the horizontal count line | Place it where objects are clearly separated |
+| Count direction | Upward, downward, or either crossing | Match the traffic flow in the clip |
+| Minimum moving-object area | Smallest contour area considered | Increase to reduce noise; decrease for distant objects |
+| Tracker matching distance | Maximum centroid distance for association | Tune for frame rate, object speed, and video resolution |
+| Large-vehicle width threshold | Splits detections into two width groups | Camera-specific heuristic; not a vehicle classifier |
+| Frame stride | Number of frames skipped between processed frames | Use 1 for best tracking continuity |
+
+## Project structure
+
+```text
+.
+├── app.py                       # Streamlit application
+├── vehicle_counter/
+│   ├── detector.py               # Frame-difference motion detector
+│   ├── tracker.py                # Centroid-based object tracker
+│   ├── counting.py                # Direction-aware line counter
+│   └── pipeline.py                # Connects detection, tracking, and counting
+├── tests/
+│   └── test_counting.py           # Tracker and counting tests
+├── assets/
+│   └── vehicleflow-architecture.svg
+├── requirements.txt
+├── pytest.ini
+└── .github/workflows/tests.yml    # CI workflow
 ```
-Tests cover track association, new-track creation, direction-aware line crossing, de-duplication, and width grouping.
 
-## How it works
-Consecutive frames are converted to grayscale and blurred. Their absolute difference is thresholded; morphology reduces isolated noise and joins nearby motion. Contours become bounding-box detections. A centroid tracker associates detections using predicted positions and a maximum distance. The line counter detects a direction-specific crossing and records each track once.
+The original `Code` source file and `IJRAR_Certificate_IJRAR_288114.pdf` are retained in the repository for reference.
 
-## Tuning
-- Use a stationary camera with vehicles moving consistently through the frame.
-- Place the line where vehicles are clearly separated.
-- Increase minimum area to suppress noise; decrease it for distant objects.
-- Tune tracker distance based on speed, frame rate, and frame stride.
-- Processing every frame gives the best continuity.
-- Width threshold depends on camera perspective and resolution; it is not a general vehicle classifier.
+## Run tests
 
-## Limitations
-Frame differencing detects motion, not vehicles. Shadows, rain, camera shake, lighting changes, pedestrians, and overlapping objects can cause errors. Stationary vehicles disappear from motion detections. Greedy centroid association can swap identities in crowded scenes. This repository has not been evaluated against a labeled benchmark; no accuracy percentage is claimed.
+```bash
+python -m pytest -q
+```
 
-A future version could add a pretrained object detector, class-aware tracking, perspective calibration, and evaluation on annotated traffic clips.
+The test suite covers:
+- Track identity association for nearby detections.
+- Creation of a new track for a distant detection.
+- Direction-aware virtual-line crossing.
+- Counting a track only once.
+- Width-grouping threshold behavior.
 
-## Original assets
-The original `Code` source and `IJRAR_Certificate_IJRAR_288114.pdf` are retained. The modern implementation lives in `vehicle_counter/` and `app.py`.
+GitHub Actions runs the tests and Python compilation check on pushes to the main branch and the modernization branch.
+
+## Known limitations
+
+- Frame differencing detects **motion**, not vehicles. Pedestrians, shadows, rain, camera shake, and lighting changes may create false detections.
+- Stationary vehicles may no longer be detected once their motion stops.
+- Overlapping objects can merge into one contour or split into multiple detections.
+- Greedy centroid matching can lose or swap identities in dense traffic.
+- Width-based grouping depends on camera perspective, object distance, and resolution.
+- Results depend on the camera angle and manually tuned thresholds.
+- The project has not been benchmarked against a labelled dataset; **no accuracy percentage is claimed**.
+
+This is an educational/research prototype, not a production traffic-monitoring, enforcement, or safety-critical system.
+
+## Roadmap
+
+- [ ] Add a real sample traffic clip and an authentic annotated output screenshot.
+- [ ] Evaluate counting performance on labelled video with precision/recall and count error.
+- [ ] Add a trained vehicle detector and class-aware tracking.
+- [ ] Improve tracking for crowded scenes and temporary occlusions.
+- [ ] Add perspective calibration and configurable regions of interest.
 
 ## Author
+
 **Sunny Shrivas**
+
+If you find the project useful, consider starring the repository.
