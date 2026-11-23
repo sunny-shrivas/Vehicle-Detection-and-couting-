@@ -1,58 +1,68 @@
-# Vehicle Detection and Counting with OpenCV
+# VehicleFlow — Vehicle Detection & Counting with OpenCV
 
-A legacy computer-vision prototype for detecting and tracking moving vehicles in a video stream and counting vehicles as they cross configured virtual lines.
+A modern Python 3 rebuild of the original project. It uses classical computer vision to detect moving regions in fixed-camera traffic footage, track them across frames, and count unique tracks crossing a configurable virtual line.
 
-The implementation uses classical image-processing and contour-tracking techniques rather than a trained deep-learning detector.
+> **Scope:** this is a motion-detection prototype, not a YOLO detector or production traffic surveillance system. Vehicle-size grouping uses bounding-box width as a heuristic, not semantic vehicle classification.
+
+## Features
+- Frame differencing, Gaussian blur, thresholding, and morphological cleanup.
+- Contour-based moving-object proposals with configurable minimum area.
+- Lightweight centroid association with predicted positions and missed-frame handling.
+- Configurable horizontal counting line with up/down/both directions.
+- Per-track de-duplication and optional width-based grouping.
+- Streamlit upload interface, annotated preview, live metrics, count timeline, and CSV export.
+- Unit tests and GitHub Actions workflow.
+
+## Architecture
+```text
+Video upload → OpenCV → MotionDetector → CentroidTracker → LineCounter
+                                              ↓
+                              Streamlit preview, metrics, CSV report
+```
+
+## Quick start
+Python 3.10 or 3.11 is recommended.
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+streamlit run app.py
+```
+Windows PowerShell:
+```powershell
+py -3.11 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+streamlit run app.py
+```
+Upload an MP4, AVI, MOV, or MKV clip, configure the line and thresholds, then start analysis.
+
+## Tests
+```bash
+pytest -q
+```
+Tests cover track association, new-track creation, direction-aware line crossing, de-duplication, and width grouping.
 
 ## How it works
+Consecutive frames are converted to grayscale and blurred. Their absolute difference is thresholded; morphology reduces isolated noise and joins nearby motion. Contours become bounding-box detections. A centroid tracker associates detections using predicted positions and a maximum distance. The line counter detects a direction-specific crossing and records each track once.
 
-The source code in `Code` follows this processing flow:
+## Tuning
+- Use a stationary camera with vehicles moving consistently through the frame.
+- Place the line where vehicles are clearly separated.
+- Increase minimum area to suppress noise; decrease it for distant objects.
+- Tune tracker distance based on speed, frame rate, and frame stride.
+- Processing every frame gives the best continuity.
+- Width threshold depends on camera perspective and resolution; it is not a general vehicle classifier.
 
-1. Read consecutive frames from a video source using OpenCV.
-2. Convert frames to grayscale and apply Gaussian blur.
-3. Compute the absolute difference between consecutive frames.
-4. Apply thresholding and morphological operations to reduce noise.
-5. Extract contours and create candidate vehicle blobs using geometric filters.
-6. Match current-frame blobs with previously tracked blobs using predicted center positions.
-7. Detect when tracked objects cross configured horizontal lines.
-8. Update and display vehicle-count overlays and frame information.
+## Limitations
+Frame differencing detects motion, not vehicles. Shadows, rain, camera shake, lighting changes, pedestrians, and overlapping objects can cause errors. Stationary vehicles disappear from motion detections. Greedy centroid association can swap identities in crowded scenes. This repository has not been evaluated against a labeled benchmark; no accuracy percentage is claimed.
 
-The original script also contains width-based logic to separate larger vehicle detections from a second, smaller-vehicle count. These thresholds are tied to the original camera/video setup and may need calibration for other footage.
+A future version could add a pretrained object detector, class-aware tracking, perspective calibration, and evaluation on annotated traffic clips.
 
-## Technology
-
-- Python (legacy Python 2-era source syntax)
-- OpenCV
-- NumPy
-
-## Repository contents
-
-- `Code` — original vehicle detection, blob tracking, and line-crossing implementation.
-- `IJRAR_Certificate_IJRAR_288114.pdf` — certificate document included with the project.
-
-## Important compatibility note
-
-This is an older implementation and is **not ready to run unchanged in a modern Python 3 environment**. The source contains Python 2 print syntax and uses an older OpenCV contour-return convention. It also sets the video filename and line coordinates directly in the script.
-
-Before running it in a current environment, the code needs to be ported to Python 3, updated for the installed OpenCV API, and configured with a valid video path and calibrated counting lines. No current Python/OpenCV version or successful modern-environment run is claimed here.
-
-## Known limitations
-
-- Motion detection by frame differencing can be affected by lighting changes, shadows, camera movement, and stationary vehicles.
-- Blob matching is a simple position-prediction approach and can lose identity when objects overlap or move close together.
-- Vehicle size thresholds and line coordinates are camera-specific.
-- The implementation does not use a modern object detector or robust multi-object tracking framework.
-- The code is a video-analysis prototype, not a production traffic-monitoring system.
-
-## Potential improvements
-
-- Port the script to Python 3 and current OpenCV APIs.
-- Move video paths, line positions, and thresholds into configuration.
-- Add sample input video and reproducible setup instructions.
-- Evaluate counting accuracy on annotated clips.
-- Compare classical motion detection with object-detection and tracking approaches.
-- Add tests for line-crossing and counting logic.
+## Original assets
+The original `Code` source and `IJRAR_Certificate_IJRAR_288114.pdf` are retained. The modern implementation lives in `vehicle_counter/` and `app.py`.
 
 ## Author
-
 **Sunny Shrivas**
